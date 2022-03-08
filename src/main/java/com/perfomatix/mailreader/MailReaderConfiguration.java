@@ -2,6 +2,7 @@ package com.perfomatix.mailreader;
 
 import com.perfomatix.mailreader.service.MailReceiverService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.integration.annotation.InboundChannelAdapter;
@@ -12,10 +13,9 @@ import org.springframework.integration.config.EnableIntegration;
 import org.springframework.integration.mail.ImapMailReceiver;
 import org.springframework.integration.mail.MailReceiver;
 import org.springframework.integration.mail.MailReceivingMessageSource;
-import org.springframework.messaging.Message;
 
+import javax.mail.Message;
 import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
 import java.io.IOException;
 import java.util.Properties;
 
@@ -33,8 +33,8 @@ public class MailReaderConfiguration {
 
 
     @ServiceActivator(inputChannel = "receiveEmailChannel")
-    public void receive(Message<?> message) throws MessagingException, IOException {
-        receiveMailService.handleMessage((MimeMessage) message.getPayload());
+    public void receive(Message message) throws MessagingException, IOException {
+        receiveMailService.handleMessage(message);
     }
 
     @Bean("receiveEmailChannel")
@@ -55,13 +55,12 @@ public class MailReaderConfiguration {
     }
 
     @Bean
-    public MailReceiver imapMailReceiver() {
-        ImapMailReceiver imapMailReceiver = new ImapMailReceiver("imaps://esi.testing:KNPass1234@mail.emea.kuehne-nagel.com/ESI-INBOUND");
+    public MailReceiver imapMailReceiver(@Value("imaps://${mail.receiver.imap.username}:${mail.receiver.imap.password}@${mail.receiver.imap.host}/${mail.receiver.imap.folder}") String storeUrl) {
+        ImapMailReceiver imapMailReceiver = new ImapMailReceiver(storeUrl);
         imapMailReceiver.setShouldMarkMessagesAsRead(true);
         imapMailReceiver.setShouldDeleteMessages(false);
         imapMailReceiver.setMaxFetchSize(10);
         // imapMailReceiver.setAutoCloseFolder(true);
-
         Properties javaMailProperties = new Properties();
         javaMailProperties.put("mail.imap.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
         javaMailProperties.put("mail.imap.socketFactory.fallback", false);

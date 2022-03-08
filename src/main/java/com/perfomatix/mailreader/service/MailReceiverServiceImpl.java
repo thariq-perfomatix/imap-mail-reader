@@ -2,8 +2,8 @@ package com.perfomatix.mailreader.service;
 
 import org.springframework.stereotype.Service;
 
+import javax.mail.Message;
 import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
 import java.io.IOException;
 
 /**
@@ -14,7 +14,8 @@ import java.io.IOException;
 @Service
 public class MailReceiverServiceImpl implements MailReceiverService{
     @Override
-    public void handleMessage(MimeMessage message) throws MessagingException, IOException {
+    public void handleMessage(Message message) throws MessagingException, IOException {
+        //process message here
         System.out.println(message.getContent());
     }
 }

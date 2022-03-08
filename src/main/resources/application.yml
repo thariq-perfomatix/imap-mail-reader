@@ -1,1 +1,11 @@
 
+
+
+#application settings
+mail:
+  receiver:
+    imap:
+      username: user
+      password: somepass
+      host: somehost
+      folder: inboxorotherfolder
